@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homestyle.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form class="lo-form" action="{{ url_for('login') }}" method="POST">
+            <div class="input-group">
+                <label for="identifier">Email or Username</label>
+                <input type="text" id="identifier" name="identifier" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required>
+                    <span class="password-toggle" onclick="togglePassword('password')">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            <button type="submit">Login</button>
+            <div class="signup-link">
+                Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+            </div>
+        </form>        
+    </div>
+
+    <style>
+    .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+        user-select: none;
+        color: #aaa;
+    }
+
+    .password-toggle:hover {
+        color: #fff;
+    }
+    </style>
+
+    <script>
+    // Prevent going back to login page after successful login
+    if (window.history && window.history.pushState) {
+        window.history.pushState('forward', null, window.location.href);
+        window.onpopstate = function(event) {
+            if(event) {
+                window.history.pushState('forward', null, window.location.href);
+            }
+        };
+    }
+
+    // Function to check login status and redirect if needed
+    function checkLoginStatus() {
+        fetch('/check-login-status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.replace('/');
+                }
+            });
+    }
+
+    // Check login status when page loads
+    document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+    // Existing password toggle function
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+    </script>
+</body>
+</html>
+
+
+
+
+
+    

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboards - Kryptos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .leaderboard-card {
+            transition: transform 0.3s ease;
+        }
+        .leaderboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .rank-1 {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+        .rank-2 {
+            background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
+        }
+        .rank-3 {
+            background: linear-gradient(45deg, #CD7F32, #B87333);
+        }
+        
+        /* Video background styles */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .video-background video {
+            position: absolute;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.7);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay loop muted playsinline>
+            <source src="static/abstract.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+    <div class="content-overlay">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold text-center mb-8">Leaderboards</h1>
+            
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto"></div>
+            </div>
+
+            <!-- Leaderboard Content -->
+            <div id="leaderboard-content" class="hidden">
+                <div class="grid gap-6">
+                    <!-- Top 3 will be displayed here -->
+                    <div id="top-3" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Top 3 cards will be dynamically inserted here -->
+                    </div>
+
+                    <!-- Rest of the leaderboard -->
+                    <div class="bg-[#333] bg-opacity-80 rounded-lg p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left border-b border-gray-600">
+                                        <th class="pb-4">Rank</th>
+                                        <th class="pb-4">Username</th>
+                                        <th class="pb-4">Bananos</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-table">
+                                    <!-- Leaderboard rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="error" class="hidden text-center py-8 text-red-500">
+                <p>Failed to load leaderboard data. Please try again later.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchLeaderboardData();
+        });
+
+        async function fetchLeaderboardData() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayLeaderboard(data.users);
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+                showError();
+            }
+        }
+
+        function displayLeaderboard(users) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('leaderboard-content');
+            const top3 = document.getElementById('top-3');
+            const table = document.getElementById('leaderboard-table');
+
+            // Hide loading, show content
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            // Clear existing content
+            top3.innerHTML = '';
+            table.innerHTML = '';
+
+            // Display top 3
+            users.slice(0, 3).forEach((user, index) => {
+                const rank = index + 1;
+                const card = createTop3Card(user, rank);
+                top3.appendChild(card);
+            });
+
+            // Display rest of the leaderboard
+            users.slice(3).forEach((user, index) => {
+                const row = createLeaderboardRow(user, index + 4);
+                table.appendChild(row);
+            });
+        }
+
+        function createTop3Card(user, rank) {
+            const card = document.createElement('div');
+            card.className = `leaderboard-card bg-[#333] rounded-lg p-6 text-center rank-${rank}`;
+            
+            card.innerHTML = `
+                <div class="text-4xl font-bold mb-4">#${rank}</div>
+                <div class="text-xl font-bold mb-2">${user.username}</div>
+                <div class="flex items-center justify-center">
+                    <img src="/static/bananos.png" alt="Bananos" class="h-6 w-6 mr-2">
+                    <span class="text-xl">${user.bananos}</span>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function createLeaderboardRow(user, rank) {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-gray-600 hover:bg-[#444]';
+            
+            row.innerHTML = `
+                <td class="py-4">#${rank}</td>
+                <td class="py-4">${user.username}</td>
+                <td class="py-4">
+                    <div class="flex items-center">
+                        <img src="/static/bananos.png" alt="Bananos" class="h-5 w-5 mr-2">
+                        ${user.bananos}
+                    </div>
+                </td>
+            `;
+            
+            return row;
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

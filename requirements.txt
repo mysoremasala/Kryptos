@@ -1,0 +1,4 @@
+Pyrebase4
+flask
+flask_login
+gunicorn

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Kryptos</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homestyle.css') }}">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top:10px;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #222; /* Base color for the card */
+            cursor: pointer;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgb(255, 255, 255); /* Softer green shadow on hover */
+        }
+
+        .faq-item h2 {
+            margin: 0;
+            padding: 15px;
+            background-color:#bbbbb; /* Softer green header color */
+            color:  rgb(197, 197, 197);
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-item h2:hover {
+            background-color: #45a049; /* Darker green on hover */
+            color:white;
+        }
+
+        .faq-item p {
+            display: none;
+            margin: 5px 0 0;
+            padding: 15px;
+            background-color: #111; /* Background for the answer */
+            color: #fff;
+        }
+
+        .faq-item.active p {
+            display: block;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .faq-container {
+                padding: 10px;
+            }
+
+            .faq-item h2 {
+                font-size: 1.2em; /* Slightly smaller font size for mobile */
+            }
+
+            .faq-item p {
+                font-size: 0.9em; /* Slightly smaller font size for mobile */
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.5em; /* Smaller title for very small screens */
+            }
+
+            .faq-item h2 {
+                font-size: 1em; /* Smaller font size for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <h1>Frequently Asked Questions</h1>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">What is Kryptos?</h2>
+            <p>Kryptos is an interactive quiz platform that allows users to test their knowledge on various topics in a fun and engaging way.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">How do I create an account?</h2>
+            <p>You can create an account by clicking on the "Sign Up" button and filling in the required information. It's quick and easy!</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">What topics are available for quizzes?</h2>
+            <p>We offer quizzes on a variety of topics including cryptography, web development, logic-based mathematics, and more! Check back often for new categories.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">How can I reset my password?</h2>
+            <p>If you forget your password, you can reset it by clicking on the "Forgot Password?" link on the login page. Follow the instructions sent to your email.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">Who can I contact for support?</h2>
+            <p>You can reach out to our support team via the contact form on our website. We're here to help you with any questions or issues!</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">Can I take quizzes on my mobile device?</h2>
+            <p>Absolutely! Our platform is fully responsive, allowing you to take quizzes on your smartphone or tablet anytime, anywhere.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">How are quiz scores calculated?</h2>
+            <p>Your score is calculated based on the number of correct answers you provide. Each correct answer earns you points, and your total score is displayed at the end of the quiz.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">Are there any time limits for quizzes?</h2>
+            <p>Yes, each quiz has a time limit to keep things exciting! You'll see a timer counting down as you answer questions.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">Can I review my quiz results later?</h2>
+            <p>Yes! After completing a quiz, you can review your results and see which questions you got right or wrong.</p>
+        </div>
+
+        <div class="faq-item">
+            <h2 onclick="toggleFAQ(this)">Is there a way to challenge my friends?</h2>
+            <p>Currently, we don't have a direct challenge feature, but you can share your scores and quiz results with friends to see who knows more!</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+    </script>
+</body>
+</html> 

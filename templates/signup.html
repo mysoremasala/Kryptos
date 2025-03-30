@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+</head>
+
+<body>
+    <div class="form-container">
+        <h1>Create Account</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('signup') }}" method="POST" onsubmit="return validateForm()">
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required 
+                       minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
+                       title="Username can only contain letters, numbers, and underscores">
+                <small class="input-help">3-20 characters, letters, numbers, and underscores only</small>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required minlength="6">
+                    <span class="password-toggle" onclick="togglePassword('password')">
+                        👁️
+                    </span>
+                </div>
+            </div>
+            
+            <button type="submit" class="form-button">Sign Up</button>
+            
+            <div class="form-link login-link">
+                Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+            </div>
+        </form>
+    </div>
+
+    <style>
+    .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+        user-select: none;
+        color: #aaa;
+    }
+
+    .password-toggle:hover {
+        color: #fff;
+    }
+
+    .password-criteria {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #222;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+
+    .password-criteria p {
+        margin: 0 0 5px 0;
+        color: #aaa;
+    }
+
+    .password-criteria ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    .password-criteria li {
+        margin: 3px 0;
+        color: #ff4444;
+    }
+
+    .password-criteria li.valid {
+        color: #00ff00;
+    }
+
+    .input-help {
+        display: block;
+        margin-top: 5px;
+        color: #aaa;
+        font-size: 0.8em;
+    }
+    </style>
+
+    <script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function checkPassword(password) {
+        const criteria = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[@$!%*?&]/.test(password)
+        };
+
+        for (const [key, valid] of Object.entries(criteria)) {
+            const element = document.getElementById(key);
+            element.className = valid ? 'valid' : '';
+            element.innerHTML = `${valid ? '✓' : '✗'} ${element.innerHTML.slice(2)}`;
+        }
+    }
+
+    function validateForm() {
+        const password = document.getElementById('password').value;
+        const criteria = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[@$!%*?&]/.test(password)
+        };
+
+        const allValid = Object.values(criteria).every(valid => valid);
+        
+        if (!allValid) {
+            alert('Please ensure your password meets all criteria.');
+            return false;
+        }
+        
+        return true;
+    }
+    </script>
+</body>
+
+</html>

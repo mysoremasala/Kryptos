@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>  body{
+        font-family: 'Courier New', Courier, monospace;
+          
+    }
+        </style>
+</head>
+<body class="bg-[#1a1a1a] text-white min-h-screen flex items-center justify-center">
+    <div class="bg-[#333] border-4 border-white rounded-lg p-8 max-w-xl w-full mx-4">
+        <h1 class="text-4xl font-bold text-center mb-8">Quiz Results</h1>
+        
+        <div class="text-center mb-8">
+            <div class="text-6xl font-bold text-[#922c2c] mb-4">
+                <span id="score">0</span>/<span id="total">20</span>
+            </div>
+            <div class="text-xl text-gray-300" id="percentage">0%</div>
+        </div>
+
+        <div class="bg-[#1a1a1a] border-2 border-white rounded p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">Performance Summary</h2>
+            <div class="space-y-2">
+                <div class="flex justify-between">
+                    <span>Correct Answers:</span>
+                    <span id="correctAnswers">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Incorrect Answers:</span>
+                    <span id="incorrectAnswers">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Time Taken:</span>
+                    <span id="timeTaken">00:00</span>
+                </div>
+                <div class="flex justify-between text-yellow-400">
+                    <span>Bananos Earned:</span>
+                    <span id="bananosEarned">0 🍌</span>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="flex justify-center space-x-4">
+            <a href="/quiz" class="px-6 py-3 bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#922c2c] transition-all duration-300 rounded">
+                Try Again
+            </a>
+            <button onclick="updateBananosAndGoHome()" class="px-6 py-3 bg-[#1a1a1a] text-white border-2 border-white hover:bg-[#922c2c] transition-all duration-300 rounded">
+                Home
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = parseInt(urlParams.get('score') || 0);
+        const total = parseInt(urlParams.get('total') || 20);
+        const bananosEarned = score * 10;
+        
+        // Update display
+        document.getElementById('score').textContent = score;
+        document.getElementById('total').textContent = total;
+        document.getElementById('percentage').textContent = 
+            Math.round((score / total) * 100) + '%';
+        document.getElementById('correctAnswers').textContent = score;
+        document.getElementById('incorrectAnswers').textContent = total - score;
+        document.getElementById('bananosEarned').textContent = `${bananosEarned} 🍌`;
+
+        async function updateBananosAndGoHome() {
+            try {
+                console.log('Sending score:', score); // Debug log
+                
+                const response = await fetch('/submit-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        score: score,
+                        category: urlParams.get('category') || 'unknown',
+                        timeTaken: urlParams.get('timeTaken') || '0:00'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('Bananos updated successfully:', data); // Debug log
+                    // Only redirect after successful update
+                    window.location.href = '/';
+                } else {
+                    console.error('Failed to update bananos:', data.error);
+                    alert('Failed to update bananos. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error updating bananos:', error);
+                alert('Error updating bananos. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', filename='js/questions.js') }}"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    borderWidth: {
+                        '3': '3px',
+                        '5': '5px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="m-0 font-sans bg-[#1a1a1a] text-white">
+    <!-- Header -->
+    <div class="p-8 text-center">
+        <h1 class="text-4xl font-bold mb-4 mt-10" id="quizTitle"></h1>
+        <p class="text-gray-400" id="quizDate"></p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-[800px] mx-auto px-4">
+        <!-- Image -->
+        <div class="mb-8">
+            <img id="quizImage" alt="Quiz background" class="w-full h-auto border-[5px] border-white">
+        </div>
+
+        <!-- Description -->
+        <div class="mb-12 text-lg leading-relaxed" id="quizDescription">
+            <!-- Description will be loaded dynamically -->
+        </div>
+
+        <!-- Quiz Info -->
+        <div class="bg-[#333] border-4 border-white p-6 mb-12">
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p class="text-gray-400 mb-2">Time Required</p>
+                    <p class="text-xl font-bold">30 Minutes</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 mb-2">Questions</p>
+                    <p class="text-xl font-bold" id="questionCount">20</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 mb-2">Difficulty</p>
+                    <p class="text-xl font-bold">Advanced</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 mb-2">Points</p>
+                    <p class="text-xl font-bold">100</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Button -->
+        <div class="text-center mb-16">
+            <a href="/quiz-interface/{{ quiz.category }}" class="start-btn px-12 py-4 bg-[#333] text-white text-xl font-bold border-4 border-white hover:bg-[#922c2c] inline-block">
+                Start Quiz
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const quizDescriptions = {
+            cryptography: {
+                title: "The Unbreakable Kryptos Code",
+                date: "May 4, 2024",
+                image: "/static/questionhq.png",
+                description: `
+                    <p class="mb-6">
+                        The Kryptos sculpture at CIA headquarters has puzzled cryptographers and amateur code breakers for decades. Despite countless attempts, part of its encrypted message remains unsolved to this day.
+                    </p>
+                    <p class="mb-6">
+                        Think you have what it takes to crack the code? Test your cryptography skills with our interactive quiz and see if you can uncover the secrets hidden within Kryptos.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your knowledge of:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">The history of Kryptos</li>
+                        <li class="mb-2">Basic cryptography concepts</li>
+                        <li class="mb-2">The solved portions of the code</li>
+                        <li class="mb-2">Various theories about the unsolved section</li>
+                    </ul>
+                    <p>
+                        Are you ready to take on one of the world's most challenging cryptographic puzzles?
+                    </p>
+                `
+            },
+            quant_finance: {
+                title: "Quantitative Finance Challenge",
+                date: "May 4, 2024",
+                image: "/static/quant.jpg",
+                description: `
+                    <p class="mb-6">
+                        Quantitative Finance is the backbone of modern financial markets. Analysts, traders, and investors rely on mathematical models and data-driven strategies to make informed decisions.
+                    </p>
+                    <p class="mb-6">
+                        Do you have what it takes to master the world of quantitative finance? Test your knowledge with this challenging quiz!
+                    </p>
+                    <p class="mb-6">This quiz will test your knowledge of:</p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Financial models and valuation techniques</li>
+                        <li class="mb-2">Risk management and portfolio optimization</li>
+                        <li class="mb-2">Derivative pricing and options trading</li>
+                        <li class="mb-2">Algorithmic trading and quantitative strategies</li>
+                    </ul>
+                    <p>Can you think like a quant and navigate the complexities of financial markets?</p>
+                `
+            },
+            coding_sequences: {
+                "title": "Coding Sequences Challenge",
+                "date": "May 4, 2024",
+                "image": "/static/coding1.jpg",
+                "description": `
+                    <p class="mb-6">
+                        Algorithms are the foundation of programming. Understanding how to construct and analyze them is crucial for writing efficient code.
+                    </p>
+                    <p class="mb-6">
+                        Can you identify the missing steps in an algorithm and complete the sequence? Test your problem-solving skills in this coding challenge!
+                    </p>
+                    <p class="mb-6">This quiz will test your knowledge of:</p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Algorithmic thinking and logic</li>
+                        <li class="mb-2">Identifying missing steps in a sequence</li>
+                        <li class="mb-2">Pattern recognition in programming</li>
+                        <li class="mb-2">Solving step-by-step coding problems</li>
+                    </ul>
+                    <p>Are you ready to debug and complete the missing pieces of an algorithm?</p>
+                `
+            },
+            morse_code: {
+                title: "Morse Code Challenge",
+                date: "May 4, 2024",
+                image: "/static/morse1.jpg",
+                description: `
+                    <p class="mb-6">
+                        Morse code is a fascinating method of telecommunication that has played a crucial role in history. Test your knowledge of this iconic code system.
+                    </p>
+                    <p class="mb-6">
+                        From basic letter recognition to advanced message decoding, this quiz will challenge your Morse code proficiency.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your knowledge of:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Morse code alphabet and numbers</li>
+                        <li class="mb-2">Common abbreviations and prosigns</li>
+                        <li class="mb-2">Message encoding and decoding</li>
+                        <li class="mb-2">The history and evolution of Morse code</li>
+                    </ul>
+                    <p>
+                        Ready to tap into your Morse code expertise?
+                    </p>
+                `
+            },
+            logicMaths: {
+                title: "Logic & Mathematics Challenge",
+                date: "May 4, 2024",
+                image: "/static/cross.png",
+                description: `
+                    <p class="mb-6">
+                        Mathematics and logic are the foundation of problem-solving. This quiz will challenge your analytical thinking and mathematical reasoning abilities.
+                    </p>
+                    <p class="mb-6">
+                        Ready to put your mathematical and logical skills to the test? Take on our comprehensive quiz covering various aspects of mathematical reasoning and logic puzzles.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your knowledge of:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Mathematical reasoning</li>
+                        <li class="mb-2">Logic puzzles</li>
+                        <li class="mb-2">Number sequences</li>
+                        <li class="mb-2">Problem-solving techniques</li>
+                    </ul>
+                    <p>
+                        Are you ready to challenge your mathematical mind?
+                    </p>
+                `
+            },
+            webDevelopment: {
+                title: "Web Development Mastery",
+                date: "May 4, 2024",
+                image: "/static/webdev.png",
+                description: `
+                    <p class="mb-6">
+                        Web development is a rapidly evolving field that requires constant learning and adaptation. Test your knowledge of modern web technologies and best practices.
+                    </p>
+                    <p class="mb-6">
+                        From front-end frameworks to back-end architecture, this quiz covers essential aspects of web development.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your knowledge of:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">HTML, CSS, and JavaScript</li>
+                        <li class="mb-2">Modern web frameworks</li>
+                        <li class="mb-2">Web security principles</li>
+                        <li class="mb-2">Responsive design techniques</li>
+                    </ul>
+                    <p>
+                        Ready to prove your web development expertise?
+                    </p>
+                `
+            },
+            cybersecurity: {
+                title: "Cybersecurity Challenge",
+                date: "May 4, 2024",
+                image: "/static/cyber.png",
+                description: `
+                    <p class="mb-6">
+                        In today's digital age, cybersecurity is more important than ever. Test your knowledge of security principles and best practices.
+                    </p>
+                    <p class="mb-6">
+                        From network security to ethical hacking, this quiz will challenge your understanding of cybersecurity concepts.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your knowledge of:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Network security</li>
+                        <li class="mb-2">Ethical hacking</li>
+                        <li class="mb-2">Security protocols</li>
+                        <li class="mb-2">Threat detection and prevention</li>
+                    </ul>
+                    <p>
+                        Are you ready to prove your cybersecurity expertise?
+                    </p>
+                `
+            },
+            logicBasedHardQuiz: {
+                title: "Advanced Logic Puzzles",
+                date: "March 16, 2025",
+                image: "/static/advanced.jpg",
+                description: `
+                    <p class="mb-6">
+                        Challenge your mind with our most difficult logic puzzles. These brain-teasers will push your problem-solving abilities to their limits.
+                    </p>
+                    <p class="mb-6">
+                        From complex riddles to mathematical conundrums, this quiz is designed for those who love a serious mental challenge.
+                    </p>
+                    <p class="mb-6">
+                        This quiz will test your skills in:
+                    </p>
+                    <ul class="list-disc list-inside mb-6 ml-4">
+                        <li class="mb-2">Advanced problem-solving</li>
+                        <li class="mb-2">Critical thinking</li>
+                        <li class="mb-2">Pattern recognition</li>
+                        <li class="mb-2">Logical reasoning</li>
+                    </ul>
+                    <p>
+                        Think you're up for the ultimate logic challenge?
+                    </p>
+                `
+            },
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const category = '{{ quiz.category }}';
+            const quizData = quizDescriptions[category];
+            
+            if (quizData) {
+                // Update page content
+                document.getElementById('quizTitle').textContent = quizData.title;
+                document.getElementById('quizDate').textContent = quizData.date;
+                document.getElementById('quizImage').src = quizData.image;
+                document.getElementById('quizDescription').innerHTML = quizData.description;
+                
+                // Update question count
+                const questionCount = QuizManager.getQuestionCount(category);
+                document.getElementById('questionCount').textContent = questionCount;
+                
+                // Update page title
+                document.title = `Quiz - ${quizData.title}`;
+            } else {
+                console.error('Quiz category not found:', category);
+            }
+        });
+    </script>
+</body>
+</html>
